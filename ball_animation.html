@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=
+    , initial-scale=1.0">
+    <title>GSAP Animation</title>
+
+    <style>
+        :root {
+            --ballSize: 200px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+            background-color: #87ceeb;
+            justify-content: center;
+            /* align-items: center; */
+        }
+
+        .ball {
+            background-color: #4169e1;
+            border-radius: 50%;
+            border: solid #bababa 3px;
+            width: var(--ballSize);
+            height: var(--ballSize);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ball"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+    <script>
+        const ball = document.querySelector('.ball');
+        gsap.to(ball, 3, { y: 500, ease: "bounce.out" })
+        gsap.to(ball, 2, { backgroundColor: "#00175b" })
+    </script>
+</body>
+
+</html>
