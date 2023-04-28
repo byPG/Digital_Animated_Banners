@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=
+    , initial-scale=1.0">
+    <title>GSAP Animation - squares</title>
+
+    <style>
+        :root {
+            --squareSize: 100px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        div {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: var(--squareSize);
+            width: var(--squareSize);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="square1"></div>
+    <div class="square2"></div>
+    <div class="square3"></div>
+    <div class="square4"></div>
+    <div class="square5"></div>
+    <div class="square6"></div>
+    <div class="square7"></div>
+    <div class="square8"></div>
+    <div class="square9"></div>
+    <div class="square10"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+    <script>
+        const divs = document.querySelectorAll('div');
+        gsap.to(divs, 3, { y: 500, ease: "bounce.out" })
+        gsap.to(divs[1], 2, { backgroundColor: "#00175b" })
+    </script>
+</body>
+
+</html>
