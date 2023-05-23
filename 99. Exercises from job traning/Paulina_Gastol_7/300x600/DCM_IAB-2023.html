@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="authoring-tool" content="$VERSION">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="ad.size" content="width=$WT,height=$HT">
+	<title>$TITLE</title>
+	<script src="https://s0.2mdn.net/ads/studio/cached_libs/tweenmax_2.0.1_min.js"></script>
+	<script src="https://s0.2mdn.net/ads/studio/cached_libs/createjs_2019.11.15_min.js"></script>
+	<script src="$TITLE.js"></script>
+	$CENTER_STYLE
+
+	$SCRIPT_START
+	var canvas, stage, exportRoot, anim_container, dom_overlay_container, fnStartAnimation, lib;
+	function init() {
+	canvas = document.getElementById("$CANVAS_ID");
+	anim_container = document.getElementById("$ANIM_CONTAINER_ID");
+	dom_overlay_container = document.getElementById("dom_overlay_container");
+	$CREATE_LOADER
+	$LOAD_MANIFEST
+	$PRELOAD_ASSETS
+	}
+	$HANDLE_FILE_LOAD_START
+	$HANDLE_FILE_LOAD_BODY
+	$HANDLE_FILE_LOAD_END
+	$HANDLE_COMPLETE_START
+	//This function is always called, irrespective of the content. You can use the variable "stage" after it is created
+	in token create_stage.
+	$CREATE_STAGE
+	//Registers the "tick" event listener.
+
+	stage.enableMouseOver();
+
+	fnStartAnimation = function() {
+	stage.addChild(exportRoot);
+	createjs.Ticker.setFPS(lib.properties.fps);
+	//createjs.Ticker.addEventListener("tick", stage);
+	TweenMax.ticker.addEventListener("tick", stage.update, stage);
+	}
+
+
+	//Code to support hidpi screens and responsive scaling.
+	function makeResponsive(isResp, respDim, isScale, scaleType) {
+	var lastW, lastH, lastS=1;
+	window.addEventListener('resize', resizeCanvas);
+	resizeCanvas();
+	function resizeCanvas() {
+	var w = lib.properties.width, h = lib.properties.height;
+	var iw = window.innerWidth, ih=window.innerHeight;
+	var pRatio = window.devicePixelRatio || 1, xRatio=iw/w, yRatio=ih/h, sRatio=1;
+	if(isResp) {
+	if((respDim=='width'&&lastW==iw) || (respDim=='height'&&lastH==ih)) {
+	sRatio = lastS;
+	}
+	else if(!isScale) {
+	if(iw<w || ih<h) sRatio=Math.min(xRatio, yRatio); } else if(scaleType==1) { sRatio=Math.min(xRatio, yRatio); } else
+		if(scaleType==2) { sRatio=Math.max(xRatio, yRatio); } } canvas.width=Math.round(w*pRatio*sRatio);
+		canvas.height=Math.round(h*pRatio*sRatio);
+		canvas.style.width=dom_overlay_container.style.width=anim_container.style.width=Math.round(w*sRatio)+'px';
+		canvas.style.height=anim_container.style.height=dom_overlay_container.style.height=Math.round(h*sRatio)+'px';
+		stage.scaleX=pRatio*sRatio; stage.scaleY=pRatio*sRatio; lastW=iw; lastH=ih; lastS=sRatio;
+		stage.tickOnUpdate=false; stage.update(); stage.tickOnUpdate=true; } } function drawBorder(){ var border=new
+		createjs.Shape(); var autobg=new createjs.Shape(); var autobgColor=lib.properties.color;
+		border.graphics.beginStroke("#666666"); /*** 100%size ***/
+		border.graphics.setStrokeStyle(1);border.ignoreScale=true;border.snapToPixel=false;border.graphics.drawRect(.5,
+		.5, lib.properties.width-1, lib.properties.height-1);stage.addChild(border);
+		autobg.graphics.beginFill(autobgColor);autobg.ignoreScale=true;autobg.snapToPixel=false;autobg.graphics.drawRect(0,
+		0, lib.properties.width, lib.properties.height);stage.addChildAt(autobg, 0); stage.update(); } $RESP_HIDPI
+		AdobeAn.compositionLoaded(lib.properties.id); fnStartAnimation(); drawBorder(); /*** Listeners ***/ if (typeof
+		exportRoot.details !=="undefined" ){ clickBtnHit=new createjs.Shape();
+		clickBtnHit.graphics.beginFill(lib.properties.color);clickBtnHit.ignoreScale=true;clickBtnHit.graphics.drawRect(0,
+		0, lib.properties.width, lib.properties.height); clickBtn=new
+		createjs.Container();clickBtn.hitArea=clickBtnHit;stage.addChildAt(clickBtn, 0); detailsBtn=new
+		createjs.Container(); detailsMcHit=new createjs.Shape();
+		detailsMcHit.graphics.beginFill("#666666");detailsMcHit.ignoreScale=true;detailsMcHit.snapToPixel=false;detailsMcHit.graphics.drawRect(0,
+		0, lib.properties.width, lib.properties.height);detailsBtn.hitArea=detailsMcHit;
+		exportRoot.detailsMc.addChildAt(detailsBtn, exportRoot.detailsMc.children.length);
+		clickBtn.addEventListener("click", onClick); //exportRoot.cta.addEventListener("click", onClick); } else{
+		canvas.addEventListener("click", onClick); } } $PLAYSOUND var getUriParams=function() { var query_string={} var
+		query=window.location.search.substring(1); var parmsArray=query.split('&'); if(parmsArray.length <=0) return
+		query_string; for(var i=0; i < parmsArray.length; i++) { var pair=parmsArray[i].split('=');
+		var val = decodeURIComponent(pair[1]);
+		if (val != '' && pair[0] != '') query_string[pair[0]] = val;
+	}
+	return query_string;
+}();
+
+	
+	var clickTag = "https://www.publicis.com/";
+	clickTag = getUriParams.clicktag ? getUriParams.clicktag : clickTag;var target = "_blank";
+	target = getUriParams.target ? getUriParams.target : target;
+	function onClick(){
+		javascript:window.open(window.clickTag, target=target);    
+	}
+
+		
+	
+
+function takeAutoShot(){}
+$SCRIPT_END
+</head>
+<body onload="init();" style="background-color:transparent;margin:0;padding:0;top:0;left:0;position:absolute;cursor:pointer;">
+	<div id="$ANIM_CONTAINER_ID" style="background-color:$BG; width:$WTpx; height:$HTpx;">
+		<canvas id="$CANVAS_ID" width="$WT" height="$HT" style="position: absolute; display: $CANVAS_DISP; background-color:$BG;margin:0;padding:0;top:0;left:0;"></canvas> 
+		<div id="dom_overlay_container" style="pointer-events:none; overflow:hidden; width:$WTpx; height:$HTpx; position: absolute; left: 0px; top: 0px; display: $CANVAS_DISP;">
+		</div>
+	</div>
+    $PRELOADER_DIV
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="authoring-tool" content="Adobe_Animate_CC">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="ad.size" content="width=300,height=250">
+<title>index</title>
+<script src="https://s0.2mdn.net/ads/studio/cached_libs/tweenmax_2.0.1_min.js"></script>
+<script src="https://s0.2mdn.net/ads/studio/cached_libs/createjs_2019.11.15_min.js"></script> 
+<script src="index.js"></script>
+<script>
+var canvas, stage, exportRoot, anim_container, dom_overlay_container, fnStartAnimation, lib;
+function init() {
+	canvas = document.getElementById("canvas");
+	anim_container = document.getElementById("animation_container");
+	dom_overlay_container = document.getElementById("dom_overlay_container");
+	var comp=AdobeAn.getComposition("6509216DC28278419456DFC87FD2EE79");
+	var lib=comp.getLibrary();
+	var loader = new createjs.LoadQueue(false);
+	loader.addEventListener("fileload", function(evt){handleFileLoad(evt,comp)});
+	loader.addEventListener("complete", function(evt){handleComplete(evt,comp)});
+	var lib=comp.getLibrary();
+	loader.loadManifest(lib.properties.manifest);
+}
+function handleFileLoad(evt, comp) {
+	var images=comp.getImages();	
+	if (evt && (evt.item.type == "image")) { images[evt.item.id] = evt.result; }	
+}
+function handleComplete(evt,comp) {
+	//This function is always called, irrespective of the content. You can use the variable "stage" after it is created in token create_stage.
+	var lib=comp.getLibrary();
+	var ss=comp.getSpriteSheet();
+	var queue = evt.target;
+	var ssMetadata = lib.ssMetadata;
+	for(i=0; i<ssMetadata.length; i++) {
+		ss[ssMetadata[i].name] = new createjs.SpriteSheet( {"images": [queue.getResult(ssMetadata[i].name)], "frames": ssMetadata[i].frames} )
+	}
+	exportRoot = new lib.index();
+	stage = new lib.Stage(canvas);
+	stage.enableMouseOver();	
+	//Registers the "tick" event listener.
+	stage.enableMouseOver();
+	fnStartAnimation = function() {
+		stage.addChild(exportRoot);
+		createjs.Ticker.setFPS(lib.properties.fps);
+		//createjs.Ticker.addEventListener("tick", stage);
+		TweenMax.ticker.addEventListener("tick", stage.update, stage);
+	}
+	//Code to support hidpi screens and responsive scaling.
+	function makeResponsive(isResp, respDim, isScale, scaleType) {		
+		var lastW, lastH, lastS=1;		
+		window.addEventListener('resize', resizeCanvas);		
+		resizeCanvas();		
+		function resizeCanvas() {			
+			var w = lib.properties.width, h = lib.properties.height;			
+			var iw = window.innerWidth, ih=window.innerHeight;			
+			var pRatio = window.devicePixelRatio || 1, xRatio=iw/w, yRatio=ih/h, sRatio=1;			
+			if(isResp) {                
+				if((respDim=='width'&&lastW==iw) || (respDim=='height'&&lastH==ih)) {                    
+					sRatio = lastS;                
+				}				
+				else if(!isScale) {					
+					if(iw<w || ih<h)						
+						sRatio = Math.min(xRatio, yRatio);				
+				}				
+				else if(scaleType==1) {					
+					sRatio = Math.min(xRatio, yRatio);				
+				}				
+				else if(scaleType==2) {					
+					sRatio = Math.max(xRatio, yRatio);				
+				}			
+			}			
+			canvas.width = Math.round(w*pRatio*sRatio);			
+			canvas.height = Math.round(h*pRatio*sRatio);
+			canvas.style.width = dom_overlay_container.style.width = anim_container.style.width =  Math.round(w*sRatio)+'px';				
+			canvas.style.height = anim_container.style.height = dom_overlay_container.style.height = Math.round(h*sRatio)+'px';
+			stage.scaleX = pRatio*sRatio;			
+			stage.scaleY = pRatio*sRatio;			
+			lastW = iw; lastH = ih; lastS = sRatio;	
+			stage.tickOnUpdate = false;            
+			stage.update();            
+			stage.tickOnUpdate = true;	
+		}
+	}
+	function drawBorder(){	
+		var border = new createjs.Shape();
+		var autobg = new createjs.Shape();
+		var autobgColor = lib.properties.color;
+		border.graphics.beginStroke("#666666");     
+		/*** 100%size ***/
+		border.graphics.setStrokeStyle(1);border.ignoreScale=true;border.snapToPixel = false;border.graphics.drawRect(.5, .5, lib.properties.width-1, lib.properties.height-1);stage.addChild(border);
+		autobg.graphics.beginFill(autobgColor);autobg.ignoreScale=true;autobg.snapToPixel = false;autobg.graphics.drawRect(0, 0, lib.properties.width, lib.properties.height);stage.addChildAt(autobg, 0);
+		stage.update();   
+	}
+	makeResponsive(false,'both',false,1);	
+	AdobeAn.compositionLoaded(lib.properties.id);
+	fnStartAnimation();
+	drawBorder();
+	/*** Listeners ***/
+	if (typeof exportRoot.details !== "undefined"){
+		clickBtnHit = new createjs.Shape();
+		clickBtnHit.graphics.beginFill(lib.properties.color);clickBtnHit.ignoreScale=true;clickBtnHit.graphics.drawRect(0, 0, lib.properties.width, lib.properties.height);
+		clickBtn = new createjs.Container();clickBtn.hitArea=clickBtnHit;stage.addChildAt(clickBtn, 0);
+		detailsBtn = new createjs.Container();
+		detailsMcHit = new createjs.Shape();
+		detailsMcHit.graphics.beginFill("#666666");detailsMcHit.ignoreScale=true;detailsMcHit.snapToPixel = false;detailsMcHit.graphics.drawRect(0, 0, lib.properties.width, lib.properties.height);detailsBtn.hitArea = detailsMcHit;
+		exportRoot.detailsMc.addChildAt(detailsBtn, exportRoot.detailsMc.children.length);
+		clickBtn.addEventListener("click", onClick);
+		//exportRoot.cta.addEventListener("click", onClick);
+	} else{
+		canvas.addEventListener("click", onClick);
+	}
+}
+var getUriParams = function() {
+	var query_string = {}
+	var query = window.location.search.substring(1);
+	var parmsArray = query.split('&');
+	if(parmsArray.length <= 0) return query_string;
+	for(var i = 0; i < parmsArray.length; i++) {
+		var pair = parmsArray[i].split('=');
+		var val = decodeURIComponent(pair[1]);
+		if (val != '' && pair[0] != '') query_string[pair[0]] = val;
+	}
+	return query_string;
+}();
+	var clickTag = "https://www.google.com/";
+	clickTag = getUriParams.clicktag ? getUriParams.clicktag : clickTag;var target = "_blank";
+	target = getUriParams.target ? getUriParams.target : target;
+	function onClick(){
+		javascript:window.open(window.clickTag, target=target);    
+	}
+function takeAutoShot(){}
+</script>
+</head>
+<body onload="init();" style="background-color:transparent;margin:0;padding:0;top:0;left:0;position:absolute;cursor:pointer;">
+	<div id="animation_container" style="background-color:rgba(255, 255, 255, 1.00); width:300px; height:250px;" onClick="onClick();">
+		<canvas id="canvas" width="300" height="250" style="position: absolute; display: block; background-color:rgba(255, 255, 255, 1.00);margin:0;padding:0;top:0;left:0;"></canvas> 
+		<div id="dom_overlay_container" style="pointer-events:none; overflow:hidden; width:300px; height:250px; position: absolute; left: 0px; top: 0px; display: block;">
+		</div>
+	</div>
+</body>
+</html>
